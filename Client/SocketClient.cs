@@ -553,12 +553,10 @@ namespace DefaultNamespace
             return value.ToString("hh:mm");
         }
 
-        //----------------------------------------------------	
-        // This is a helper function used (for convenience) to 
-        // get the IP address of the local machine
-        //----------------------------------------------------
         /// <summary>
         /// The GetIP
+        /// This is a helper function used (for convenience) to 
+        /// get the IP address of the local machine
         /// </summary>
         /// <returns>The <see cref="String"/></returns>
         internal String GetIP()
