@@ -6,64 +6,149 @@
  * 
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
-using System;
-using System.Windows.Forms;
-using System.Net;
-using System.Net.Sockets;
-
 
 namespace DefaultNamespace
 {
-	/// <summary>
-	/// Description of SocketClient.	
-	/// </summary>
-	public class SocketClient : System.Windows.Forms.Form
-	{
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Button buttonDisconnect;
-		private System.Windows.Forms.TextBox textBoxIP;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Button buttonConnect;
-		private System.Windows.Forms.TextBox textBoxPort;
-		private System.Windows.Forms.RichTextBox richTextRxMessage;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox textBoxConnectStatus;
-		private System.Windows.Forms.RichTextBox richTextTxMessage;
-		private System.Windows.Forms.Button buttonSendMessage;
-		private System.Windows.Forms.Button buttonClose;
-		
-		byte[] m_dataBuffer = new byte [10];
-		IAsyncResult m_result;
-		public AsyncCallback m_pfnCallBack ;
-		public Socket m_clientSocket;
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Windows.Forms;
+
+    /// <summary>
+    /// Description of SocketClient.
+    /// </summary>
+    public class SocketClient : System.Windows.Forms.Form
+    {
+        /// <summary>
+        /// Defines the label3
+        /// </summary>
+        private System.Windows.Forms.Label label3;
+
+        /// <summary>
+        /// Defines the label2
+        /// </summary>
+        private System.Windows.Forms.Label label2;
+
+        /// <summary>
+        /// Defines the label1
+        /// </summary>
+        private System.Windows.Forms.Label label1;
+
+        /// <summary>
+        /// Defines the buttonDisconnect
+        /// </summary>
+        private System.Windows.Forms.Button buttonDisconnect;
+
+        /// <summary>
+        /// Defines the textBoxIP
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxIP;
+
+        /// <summary>
+        /// Defines the label5
+        /// </summary>
+        private System.Windows.Forms.Label label5;
+
+        /// <summary>
+        /// Defines the buttonConnect
+        /// </summary>
+        private System.Windows.Forms.Button buttonConnect;
+
+        /// <summary>
+        /// Defines the textBoxPort
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxPort;
+
+        /// <summary>
+        /// Defines the richTextRxMessage
+        /// </summary>
+        private System.Windows.Forms.RichTextBox richTextRxMessage;
+
+        /// <summary>
+        /// Defines the label4
+        /// </summary>
+        private System.Windows.Forms.Label label4;
+
+        /// <summary>
+        /// Defines the textBoxConnectStatus
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxConnectStatus;
+
+        /// <summary>
+        /// Defines the richTextTxMessage
+        /// </summary>
+        private System.Windows.Forms.RichTextBox richTextTxMessage;
+
+        /// <summary>
+        /// Defines the buttonSendMessage
+        /// </summary>
+        private System.Windows.Forms.Button buttonSendMessage;
+
+        /// <summary>
+        /// Defines the buttonClose
+        /// </summary>
+        private System.Windows.Forms.Button buttonClose;
+
+        /// <summary>
+        /// Defines the m_dataBuffer
+        /// </summary>
+        internal byte[] m_dataBuffer = new byte[10];
+
+        /// <summary>
+        /// Defines the m_result
+        /// </summary>
+        internal IAsyncResult m_result;
+
+        /// <summary>
+        /// Defines the m_pfnCallBack
+        /// </summary>
+        public AsyncCallback m_pfnCallBack;
+
+        /// <summary>
+        /// Defines the m_clientSocket
+        /// </summary>
+        public Socket m_clientSocket;
+
+        /// <summary>
+        /// Defines the clientId
+        /// </summary>
         private String clientId;
+
+        /// <summary>
+        /// Defines the isFirstPacket
+        /// </summary>
         private bool isFirstPacket;
-		
-		public SocketClient()
-		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
-			InitializeComponent();
-			
-			textBoxIP.Text = GetIP();
-		}
-		
-		[STAThread]
-		public static void Main(string[] args)
-		{
-			Application.Run(new SocketClient());
-		}
-		
-		#region Windows Forms Designer generated code
-		/// <summary>
-		/// This method is required for Windows Forms designer support.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SocketClient"/> class.
+        /// </summary>
+        public SocketClient()
+        {
+            //
+            // The InitializeComponent() call is required for Windows Forms designer support.
+            //
+            InitializeComponent();
+
+            textBoxIP.Text = GetIP();
+        }
+
+        /// <summary>
+        /// The Main
+        /// </summary>
+        /// <param name="args">The args<see cref="string[]"/></param>
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            Application.Run(new SocketClient());
+        }
+
+        /// <summary>
+        /// This method is required for Windows Forms designer support.
 		/// Do not change the method contents inside the source code editor. The Forms designer might
 		/// not be able to load this method if it was changed manually.
-		/// </summary>
-		private void InitializeComponent() {
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.buttonClose = new System.Windows.Forms.Button();
             this.buttonSendMessage = new System.Windows.Forms.Button();
             this.richTextTxMessage = new System.Windows.Forms.RichTextBox();
@@ -232,115 +317,151 @@ namespace DefaultNamespace
             this.Text = "Socket Client";
             this.ResumeLayout(false);
             this.PerformLayout();
+        }
 
-		}
-		#endregion
-		void ButtonCloseClick(object sender, System.EventArgs e)
-		{
-			if ( m_clientSocket != null )
-			{
-				m_clientSocket.Close ();
-				m_clientSocket = null;
-			}		
-			Close();
-		}
-		
-		void ButtonConnectClick(object sender, System.EventArgs e)
-		{
-			// See if we have text on the IP and Port text fields
-			if(textBoxIP.Text == "" || textBoxPort.Text == ""){
-				MessageBox.Show("IP Address and Port Number are required to connect to the Server\n");
-				return;
-			}
-			try
-			{
-				UpdateControls(false);
-				// Create the socket instance
-				m_clientSocket = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
-				
-				// Cet the remote IP address
-				IPAddress ip = IPAddress.Parse (textBoxIP.Text);
-				int iPortNo = System.Convert.ToInt16 ( textBoxPort.Text);
-				// Create the end point 
-				IPEndPoint ipEnd = new IPEndPoint (ip,iPortNo);
-				// Connect to the remote host
-				m_clientSocket.Connect ( ipEnd );
-				if(m_clientSocket.Connected) {
-					
-					UpdateControls(true);
+        /// <summary>
+        /// The ButtonCloseClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonCloseClick(object sender, System.EventArgs e)
+        {
+            if (m_clientSocket != null)
+            {
+                m_clientSocket.Close();
+                m_clientSocket = null;
+            }
+            Close();
+        }
+
+        /// <summary>
+        /// The ButtonConnectClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonConnectClick(object sender, System.EventArgs e)
+        {
+            // See if we have text on the IP and Port text fields
+            if (textBoxIP.Text == "" || textBoxPort.Text == "")
+            {
+                MessageBox.Show("IP Address and Port Number are required to connect to the Server\n");
+                return;
+            }
+            try
+            {
+                UpdateControls(false);
+                // Create the socket instance
+                m_clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                // Cet the remote IP address
+                IPAddress ip = IPAddress.Parse(textBoxIP.Text);
+                int iPortNo = System.Convert.ToInt16(textBoxPort.Text);
+                // Create the end point 
+                IPEndPoint ipEnd = new IPEndPoint(ip, iPortNo);
+                // Connect to the remote host
+                m_clientSocket.Connect(ipEnd);
+                if (m_clientSocket.Connected)
+                {
+
+                    UpdateControls(true);
                     //Wait for data asynchronously 
                     isFirstPacket = true;
-					WaitForData();
-				}
-			}
-			catch(SocketException se)
-			{
-				string str;
-				str = "\nConnection failed, is the server running?\n" + se.Message;
-				MessageBox.Show (str);
-				UpdateControls(false);
-			}		
-		}			
-		void ButtonSendMessageClick(object sender, System.EventArgs e)
-		{
-			try
-			{
-				Object objData = richTextTxMessage.Text;
-				byte[] byData = System.Text.Encoding.ASCII.GetBytes(objData.ToString());
-				if(m_clientSocket != null){
-					m_clientSocket.Send (byData);
+                    WaitForData();
+                }
+            }
+            catch (SocketException se)
+            {
+                string str;
+                str = "\nConnection failed, is the server running?\n" + se.Message;
+                MessageBox.Show(str);
+                UpdateControls(false);
+            }
+        }
+
+        /// <summary>
+        /// The ButtonSendMessageClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonSendMessageClick(object sender, System.EventArgs e)
+        {
+            try
+            {
+                Object objData = richTextTxMessage.Text;
+                byte[] byData = System.Text.Encoding.ASCII.GetBytes(objData.ToString());
+                if (m_clientSocket != null)
+                {
+                    m_clientSocket.Send(byData);
                     // Clear the message box
                     Invoke(new Action(() =>
                     {
                         richTextTxMessage.Text = "";
                     }));
-				}
+                }
 
-			}
-			catch(SocketException se)
-			{
-				MessageBox.Show (se.Message );
-			}	
-		}
-		public void WaitForData()
-		{
-			try
-			{
-				if  ( m_pfnCallBack == null ) 
-				{
-					m_pfnCallBack = new AsyncCallback (OnDataReceived);
-				}
-				SocketPacket theSocPkt = new SocketPacket ();
-				theSocPkt.thisSocket = m_clientSocket;
-				// Start listening to the data asynchronously
-				m_result = m_clientSocket.BeginReceive (theSocPkt.dataBuffer,
-				                                        0, theSocPkt.dataBuffer.Length,
-				                                        SocketFlags.None, 
-				                                        m_pfnCallBack, 
-				                                        theSocPkt);
-			}
-			catch(SocketException se)
-			{
-				MessageBox.Show (se.Message );
-			}
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message);
+            }
+        }
 
-		}
-		public class SocketPacket
-		{
-			public System.Net.Sockets.Socket thisSocket;
-			public byte[] dataBuffer = new byte[255];
-		}
+        /// <summary>
+        /// The WaitForData
+        /// </summary>
+        public void WaitForData()
+        {
+            try
+            {
+                if (m_pfnCallBack == null)
+                {
+                    m_pfnCallBack = new AsyncCallback(OnDataReceived);
+                }
+                SocketPacket theSocPkt = new SocketPacket();
+                theSocPkt.thisSocket = m_clientSocket;
+                // Start listening to the data asynchronously
+                m_result = m_clientSocket.BeginReceive(theSocPkt.dataBuffer,
+                                                        0, theSocPkt.dataBuffer.Length,
+                                                        SocketFlags.None,
+                                                        m_pfnCallBack,
+                                                        theSocPkt);
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message);
+            }
+        }
 
-		public  void OnDataReceived(IAsyncResult asyn)
-		{
-			try
-			{
-				SocketPacket theSockId = (SocketPacket)asyn.AsyncState ;
-				int iRx  = theSockId.thisSocket.EndReceive (asyn);
-				char[] chars = new char[iRx +  1];
-				System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
-				int charLen = d.GetChars(theSockId.dataBuffer, 0, iRx, chars, 0);
-				System.String szData = new System.String(chars);
+        /// <summary>
+        /// Defines the <see cref="SocketPacket" />
+        /// </summary>
+        public class SocketPacket
+        {
+            /// <summary>
+            /// Defines the thisSocket
+            /// </summary>
+            public System.Net.Sockets.Socket thisSocket;
+
+            /// <summary>
+            /// Defines the dataBuffer
+            /// </summary>
+            public byte[] dataBuffer = new byte[255];
+        }
+
+        /// <summary>
+        /// The OnDataReceived
+        /// </summary>
+        /// <param name="asyn">The asyn<see cref="IAsyncResult"/></param>
+        public void OnDataReceived(IAsyncResult asyn)
+        {
+            try
+            {
+                SocketPacket theSockId = (SocketPacket)asyn.AsyncState;
+                int iRx = theSockId.thisSocket.EndReceive(asyn);
+                char[] chars = new char[iRx + 1];
+                System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
+                int charLen = d.GetChars(theSockId.dataBuffer, 0, iRx, chars, 0);
+                System.String szData = new System.String(chars);
 
                 // First packet is the ID for this client
                 if (isFirstPacket)
@@ -348,25 +469,32 @@ namespace DefaultNamespace
                     isFirstPacket = false;
                     clientId = szData;
                     UpdateControls(theSockId.thisSocket.Connected);
-                } else {
+                }
+                else
+                {
                     LogIncomingMessageToForm(szData);
                 }
 
-				WaitForData();
-			}
-			catch (ObjectDisposedException )
-			{
-				System.Diagnostics.Debugger.Log(0,"1","\nOnDataReceived: Socket has been closed\n");
+                WaitForData();
+            }
+            catch (ObjectDisposedException)
+            {
+                System.Diagnostics.Debugger.Log(0, "1", "\nOnDataReceived: Socket has been closed\n");
                 UpdateControls(false);
-			}
-			catch(SocketException se)
-			{
-                MessageBox.Show (se.Message );
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message);
                 UpdateControls(false);
-			}
-		}	
-		private void UpdateControls( bool connected ) 
-		{
+            }
+        }
+
+        /// <summary>
+        /// The UpdateControls
+        /// </summary>
+        /// <param name="connected">The connected<see cref="bool"/></param>
+        private void UpdateControls(bool connected)
+        {
             Invoke(new Action(() =>
             {
                 buttonConnect.Enabled = !connected;
@@ -375,24 +503,36 @@ namespace DefaultNamespace
                 if (connected)
                 {
                     connectStatus = String.Format("Connected ClientID:{1}", connectStatus, clientId);
-                } else {
+                }
+                else
+                {
                     connectStatus = "Not Connected";
                     clientId = "";
                 }
                 textBoxConnectStatus.Text = connectStatus;
             }));
-		}
-		void ButtonDisconnectClick(object sender, System.EventArgs e)
-		{
-			if ( m_clientSocket != null )
-			{
-				m_clientSocket.Close();
-				m_clientSocket = null;
-				UpdateControls(false);
-			}
-		}
+        }
 
-        void LogIncomingMessageToForm(String msg)
+        /// <summary>
+        /// The ButtonDisconnectClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonDisconnectClick(object sender, System.EventArgs e)
+        {
+            if (m_clientSocket != null)
+            {
+                m_clientSocket.Close();
+                m_clientSocket = null;
+                UpdateControls(false);
+            }
+        }
+
+        /// <summary>
+        /// The LogIncomingMessageToForm
+        /// </summary>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void LogIncomingMessageToForm(String msg)
         {
             Invoke(new Action(() =>
             {
@@ -402,24 +542,33 @@ namespace DefaultNamespace
                 richTextRxMessage.ScrollToCaret();
             }));
         }
-	
-        String GetTimeStamp(DateTime value)
+
+        /// <summary>
+        /// The GetTimeStamp
+        /// </summary>
+        /// <param name="value">The value<see cref="DateTime"/></param>
+        /// <returns>The <see cref="String"/></returns>
+        internal String GetTimeStamp(DateTime value)
         {
             return value.ToString("hh:mm");
         }
 
-	   //----------------------------------------------------	
-	   // This is a helper function used (for convenience) to 
-	   // get the IP address of the local machine
-   	   //----------------------------------------------------
-   	   String GetIP()
-	   {
+        //----------------------------------------------------	
+        // This is a helper function used (for convenience) to 
+        // get the IP address of the local machine
+        //----------------------------------------------------
+        /// <summary>
+        /// The GetIP
+        /// </summary>
+        /// <returns>The <see cref="String"/></returns>
+        internal String GetIP()
+        {
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP))
             {
                 socket.Connect("8.8.8.8", 65530);
                 IPEndPoint endpoint = socket.LocalEndPoint as IPEndPoint;
                 return endpoint.Address.ToString();
             }
-	   }		
-	}
+        }
+    }
 }

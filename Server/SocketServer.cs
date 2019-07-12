@@ -6,45 +6,129 @@
  * 
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
-using System;
-using System.Windows.Forms;
-using System.Net;
-using System.Net.Sockets;
 
 namespace DefaultNamespace
 {
-	/// <summary>
-	/// Description of SocketServer.	
-	/// </summary>
-	public class SocketServer : System.Windows.Forms.Form
-	{
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.RichTextBox richTextBoxReceivedMsg;
-		private System.Windows.Forms.TextBox textBoxPort;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox textBoxMsg;
-		private System.Windows.Forms.Button buttonStopListen;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.RichTextBox richTextBoxSendMsg;
-		private System.Windows.Forms.TextBox textBoxIP;
-		private System.Windows.Forms.Button buttonStartListen;
-		private System.Windows.Forms.Button buttonSendMsg;
-		private System.Windows.Forms.Button buttonClose;
-		
-		
-		const int MAX_CLIENTS = 10;
-		
-		public AsyncCallback pfnWorkerCallBack ;
-		private  Socket m_mainSocket;
-		private  Socket [] m_workerSocket = new Socket[30]; // Hard limit of 30 TOTAL CONNECTIONS!!
-		private int m_clientCount = 0;
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Windows.Forms;
+
+    /// <summary>
+    /// Description of SocketServer.
+    /// </summary>
+    public class SocketServer : System.Windows.Forms.Form
+    {
+        /// <summary>
+        /// Defines the label3
+        /// </summary>
+        private System.Windows.Forms.Label label3;
+
+        /// <summary>
+        /// Defines the label2
+        /// </summary>
+        private System.Windows.Forms.Label label2;
+
+        /// <summary>
+        /// Defines the richTextBoxReceivedMsg
+        /// </summary>
+        private System.Windows.Forms.RichTextBox richTextBoxReceivedMsg;
+
+        /// <summary>
+        /// Defines the textBoxPort
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxPort;
+
+        /// <summary>
+        /// Defines the label5
+        /// </summary>
+        private System.Windows.Forms.Label label5;
+
+        /// <summary>
+        /// Defines the label4
+        /// </summary>
+        private System.Windows.Forms.Label label4;
+
+        /// <summary>
+        /// Defines the textBoxMsg
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxMsg;
+
+        /// <summary>
+        /// Defines the buttonStopListen
+        /// </summary>
+        private System.Windows.Forms.Button buttonStopListen;
+
+        /// <summary>
+        /// Defines the label1
+        /// </summary>
+        private System.Windows.Forms.Label label1;
+
+        /// <summary>
+        /// Defines the richTextBoxSendMsg
+        /// </summary>
+        private System.Windows.Forms.RichTextBox richTextBoxSendMsg;
+
+        /// <summary>
+        /// Defines the textBoxIP
+        /// </summary>
+        private System.Windows.Forms.TextBox textBoxIP;
+
+        /// <summary>
+        /// Defines the buttonStartListen
+        /// </summary>
+        private System.Windows.Forms.Button buttonStartListen;
+
+        /// <summary>
+        /// Defines the buttonSendMsg
+        /// </summary>
+        private System.Windows.Forms.Button buttonSendMsg;
+
+        /// <summary>
+        /// Defines the buttonClose
+        /// </summary>
+        private System.Windows.Forms.Button buttonClose;
+
+        /// <summary>
+        /// Defines the MAX_CLIENTS
+        /// </summary>
+        internal const int MAX_CLIENTS = 10;
+
+        /// <summary>
+        /// Defines the pfnWorkerCallBack
+        /// </summary>
+        public AsyncCallback pfnWorkerCallBack ;
+
+        /// <summary>
+        /// Defines the m_mainSocket
+        /// </summary>
+        private  Socket m_mainSocket;
+
+        /// <summary>
+        /// Defines the m_workerSocket
+        /// </summary>
+        private  Socket [] m_workerSocket = new Socket[30];// Hard limit of 30 TOTAL CONNECTIONS!!
+
+        /// <summary>
+        /// Defines the m_clientCount
+        /// </summary>
+        private int m_clientCount = 0;
+
+        /// <summary>
+        /// Defines the broadcastCheckbox
+        /// </summary>
         private CheckBox broadcastCheckbox;
+
+        /// <summary>
+        /// Defines the broadcastIncomingMessages
+        /// </summary>
         private bool broadcastIncomingMessages = false;
-		
-		public SocketServer()
-		{
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SocketServer"/> class.
+        /// </summary>
+        public SocketServer()
+        {
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
@@ -52,21 +136,24 @@ namespace DefaultNamespace
 			
 			// Display the local IP address on the GUI
 			textBoxIP.Text = GetIP();
-		}
-		
-		[STAThread]
+        }
+
+        /// <summary>
+        /// The Main
+        /// </summary>
+        /// <param name="args">The args<see cref="string[]"/></param>
+        [STAThread]
 		public static void Main(string[] args)
-		{
+        {
 			Application.Run(new SocketServer());
-		}
-		
-		#region Windows Forms Designer generated code
-		/// <summary>
-		/// This method is required for Windows Forms designer support.
+        }
+
+        /// <summary>
+        /// This method is required for Windows Forms designer support.
 		/// Do not change the method contents inside the source code editor. The Forms designer might
 		/// not be able to load this method if it was changed manually.
-		/// </summary>
-		private void InitializeComponent() {
+        /// </summary>
+        private void InitializeComponent()         {
             this.buttonClose = new System.Windows.Forms.Button();
             this.buttonSendMsg = new System.Windows.Forms.Button();
             this.buttonStartListen = new System.Windows.Forms.Button();
@@ -250,11 +337,15 @@ namespace DefaultNamespace
             this.Text = "SocketServer";
             this.ResumeLayout(false);
             this.PerformLayout();
+        }
 
-		}
-		#endregion
-		void ButtonStartListenClick(object sender, System.EventArgs e)
-		{
+        /// <summary>
+        /// The ButtonStartListenClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonStartListenClick(object sender, System.EventArgs e)
+        {
 			try
 			{
 				// Check the port value
@@ -283,16 +374,25 @@ namespace DefaultNamespace
 			{
 				MessageBox.Show ( se.Message );
 			}
+        }
 
-		}
-		private void UpdateControls( bool listening ) 
-		{
+        /// <summary>
+        /// The UpdateControls
+        /// </summary>
+        /// <param name="listening">The listening<see cref="bool"/></param>
+        private void UpdateControls( bool listening ) 
+        {
 			buttonStartListen.Enabled 	= !listening;
 			buttonStopListen.Enabled 	= listening;
-		}	
-		// This is the call back function, which will be invoked when a client is connected
-		public void OnClientConnect(IAsyncResult asyn)
-		{
+        }
+
+        // This is the call back function, which will be invoked when a client is connected
+        /// <summary>
+        /// The OnClientConnect
+        /// </summary>
+        /// <param name="asyn">The asyn<see cref="IAsyncResult"/></param>
+        public void OnClientConnect(IAsyncResult asyn)
+        {
 			try
 			{
 				// Here we complete/end the BeginAccept() asynchronous call
@@ -331,17 +431,36 @@ namespace DefaultNamespace
 			{
 				MessageBox.Show ( se.Message );
 			}
-			
-		}
-		public class SocketPacket
-		{
-			public System.Net.Sockets.Socket m_currentSocket;
-			public byte[] dataBuffer = new byte[255];
+        }
+
+        /// <summary>
+        /// Defines the <see cref="SocketPacket" />
+        /// </summary>
+        public class SocketPacket
+        {
+            /// <summary>
+            /// Defines the m_currentSocket
+            /// </summary>
+            public System.Net.Sockets.Socket m_currentSocket;
+
+            /// <summary>
+            /// Defines the dataBuffer
+            /// </summary>
+            public byte[] dataBuffer = new byte[255];
+
+            /// <summary>
+            /// Defines the id
+            /// </summary>
             public int id;
-		}
-		// Start waiting for data from the client
-		public void WaitForData(int id)
-		{
+        }
+
+        // Start waiting for data from the client
+        /// <summary>
+        /// The WaitForData
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/></param>
+        public void WaitForData(int id)
+        {
             Socket soc = m_workerSocket[id];
 			try
 			{
@@ -366,12 +485,16 @@ namespace DefaultNamespace
 			{
 				MessageBox.Show (se.Message );
 			}
+        }
 
-		}
-		// This the call back function which will be invoked when the socket
+        // This the call back function which will be invoked when the socket
 		// detects any client writing of data on the stream
-		public  void OnDataReceived(IAsyncResult asyn)
-		{
+        /// <summary>
+        /// The OnDataReceived
+        /// </summary>
+        /// <param name="asyn">The asyn<see cref="IAsyncResult"/></param>
+        public  void OnDataReceived(IAsyncResult asyn)
+        {
 			try
 			{
 				SocketPacket socketData = (SocketPacket)asyn.AsyncState ;
@@ -403,25 +526,45 @@ namespace DefaultNamespace
 			{
                 MessageBox.Show(se.Message);
 			}
-		}
-		void ButtonSendMsgClick(object sender, System.EventArgs e)
-		{
+        }
+
+        /// <summary>
+        /// The ButtonSendMsgClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonSendMsgClick(object sender, System.EventArgs e)
+        {
             String msg = richTextBoxSendMsg.Text;
             SendMsgToAll(msg);
-		}
+        }
 
         // Adds timestamp and ID to message before being sent
-        void SendMsgToAll(String msg)
+        /// <summary>
+        /// The SendMsgToAll
+        /// </summary>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void SendMsgToAll(String msg)
         {
             SendToAll(AddMetaToMessage("", msg));
         }
-        void SendMsgToAll(String id, String msg)
+
+        /// <summary>
+        /// The SendMsgToAll
+        /// </summary>
+        /// <param name="id">The id<see cref="String"/></param>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void SendMsgToAll(String id, String msg)
         {
             SendToAll(AddMetaToMessage(id, msg));
         }
 
         // Sends message as is to all clients
-        void SendToAll(String message)
+        /// <summary>
+        /// The SendToAll
+        /// </summary>
+        /// <param name="message">The message<see cref="String"/></param>
+        internal void SendToAll(String message)
         {
 			try
 			{
@@ -441,24 +584,45 @@ namespace DefaultNamespace
         }
 
         // Returns the string with meta data appended to it (Timestamp, ID)
-        String AddMetaToMessage(String id, String msg)
+        /// <summary>
+        /// The AddMetaToMessage
+        /// </summary>
+        /// <param name="id">The id<see cref="String"/></param>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        /// <returns>The <see cref="String"/></returns>
+        internal String AddMetaToMessage(String id, String msg)
         {
             id = id == "" ? "S" : id;
             String message = String.Format("{0}#{1} - {2}", GetTimeStamp(DateTime.Now), id, msg);
             return message;
         }
-		
-		void ButtonStopListenClick(object sender, System.EventArgs e)
-		{
+
+        /// <summary>
+        /// The ButtonStopListenClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonStopListenClick(object sender, System.EventArgs e)
+        {
 			CloseSockets();			
 			UpdateControls(false);
-		}
+        }
 
-        void LogIncomingMessageToForm(String msg)
+        /// <summary>
+        /// The LogIncomingMessageToForm
+        /// </summary>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void LogIncomingMessageToForm(String msg)
         {
             LogIncomingMessageToForm("", msg);
         }
-        void LogIncomingMessageToForm(String clientId, String msg)
+
+        /// <summary>
+        /// The LogIncomingMessageToForm
+        /// </summary>
+        /// <param name="clientId">The clientId<see cref="String"/></param>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void LogIncomingMessageToForm(String clientId, String msg)
         {
             String message = AddMetaToMessage(clientId, msg);
             Invoke(new Action(() =>
@@ -468,13 +632,22 @@ namespace DefaultNamespace
                 richTextBoxReceivedMsg.ScrollToCaret();
             }));
         }
-	
-        String GetTimeStamp(DateTime value)
+
+        /// <summary>
+        /// The GetTimeStamp
+        /// </summary>
+        /// <param name="value">The value<see cref="DateTime"/></param>
+        /// <returns>The <see cref="String"/></returns>
+        internal String GetTimeStamp(DateTime value)
         {
             return value.ToString("hh:mm");
         }
 
-        void SetFormStatus(String msg)
+        /// <summary>
+        /// The SetFormStatus
+        /// </summary>
+        /// <param name="msg">The msg<see cref="String"/></param>
+        internal void SetFormStatus(String msg)
         {
             Invoke(new Action(() =>
             {
@@ -482,22 +655,36 @@ namespace DefaultNamespace
             }));
         }
 
-	   String GetIP()
-	   {	   
+        /// <summary>
+        /// The GetIP
+        /// </summary>
+        /// <returns>The <see cref="String"/></returns>
+        internal String GetIP()
+        {
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.IP))
             {
                 socket.Connect("8.8.8.8", 65530);
                 IPEndPoint endpoint = socket.LocalEndPoint as IPEndPoint;
                 return endpoint.Address.ToString();
             }
-	   }
-	   void ButtonCloseClick(object sender, System.EventArgs e)
-	   {
+        }
+
+        /// <summary>
+        /// The ButtonCloseClick
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="System.EventArgs"/></param>
+        internal void ButtonCloseClick(object sender, System.EventArgs e)
+        {
 	   		CloseSockets();
 	   		Close();
-	   }
-	   void CloseSockets()
-	   {
+        }
+
+        /// <summary>
+        /// The CloseSockets
+        /// </summary>
+        internal void CloseSockets()
+        {
 	   		if(m_mainSocket != null){
 	   			m_mainSocket.Close();
 	   		}
@@ -507,8 +694,13 @@ namespace DefaultNamespace
 					m_workerSocket[i] = null;
 				}
 			}	
-	   }
+        }
 
+        /// <summary>
+        /// The BroadcastCheckbox_CheckedChanged
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/></param>
+        /// <param name="e">The e<see cref="EventArgs"/></param>
         private void BroadcastCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;

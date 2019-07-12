@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project1", "Project1\Project1.csproj", "{77908E53-397F-4D3B-B007-15325D3439CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{B2102DE5-95AC-47BC-93E5-A9156785F5D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "WindowsFormsApplication1\Client.csproj", "{B2102DE5-95AC-47BC-93E5-A9156785F5D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "WindowsFormsApplication2\Server.csproj", "{FF573208-3BC7-4DDC-A5B5-738BE3F3EADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{FF573208-3BC7-4DDC-A5B5-738BE3F3EADB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{77908E53-397F-4D3B-B007-15325D3439CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77908E53-397F-4D3B-B007-15325D3439CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77908E53-397F-4D3B-B007-15325D3439CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77908E53-397F-4D3B-B007-15325D3439CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B2102DE5-95AC-47BC-93E5-A9156785F5D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2102DE5-95AC-47BC-93E5-A9156785F5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2102DE5-95AC-47BC-93E5-A9156785F5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
